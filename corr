@@ -1,0 +1,40 @@
+import pandas as pd
+
+data = pd.read_csv("c:\python\data\heights.csv")
+
+#불러온 데이터중 분석할 컬럼 선택
+df = pd.DataFrame(data, columns = ['height','weight'])
+
+#결측치 제거
+df_drop_row = df.dropna()
+
+#상관계수 
+corr = df_drop_row.corr(method = 'pearson')
+corr
+
+#데이터 시각화
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib 
+
+#상관성 그래프 위쪽/아래쪽/중간 
+g = sns.pairplot(df_drop_row, markers = '*')
+g.map_upper(sns.regplot)
+g.map_lower(sns.kdeplot)
+g.map_diag(sns.distplot)
+
+import scipy.stats as stats
+
+corr = stats. pearsonr(df_drop_row.height, df_drop_row.weight)
+corr
+
+pip install pymannkendall
+
+import numpy as np
+import pymannkendall as mk
+
+data2 = np.random.rand(360,1)
+data2
+
+result = mk.original_test(data2)
+print(result)
