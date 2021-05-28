@@ -1,40 +1,71 @@
-import pandas as pd
-
-data = pd.read_csv("c:\python\data\heights.csv")
-
-#불러온 데이터중 분석할 컬럼 선택
-df = pd.DataFrame(data, columns = ['height','weight'])
-
-#결측치 제거
-df_drop_row = df.dropna()
-
-#상관계수 
-corr = df_drop_row.corr(method = 'pearson')
-corr
-
-#데이터 시각화
-import matplotlib.pyplot as plt
-import seaborn as sns
-%matplotlib 
-
-#상관성 그래프 위쪽/아래쪽/중간 
-g = sns.pairplot(df_drop_row, markers = '*')
-g.map_upper(sns.regplot)
-g.map_lower(sns.kdeplot)
-g.map_diag(sns.distplot)
-
-import scipy.stats as stats
-
-corr = stats. pearsonr(df_drop_row.height, df_drop_row.weight)
-corr
-
-pip install pymannkendall
-
 import numpy as np
-import pymannkendall as mk
+import pandas as pd
+umport matplotlib.pyplot as plt
+from scipy import stats
+from scipy.stats import spearmanr #스피어만 상관분석을 위해
+from pandas import DataFrame
+from sklearn.preprocessing import StandardScaler #데이터의 표준화를 위해
 
-data2 = np.random.rand(360,1)
-data2
+#pd.read_csv로 파일을 파이썬으로 불러오기, pd.read_excel로 엑셀 파일 불러오기
+data = pd.read_csv("c:\python\DATA\___.csv", encoding = 'CP949', usecols = [ , , , , , ,]
 
-result = mk.original_test(data2)
-print(result)
+#불러온 데이터 확임
+data.head()  
+
+#불러온 데이터 중 결측치 제거
+df = data.dropna()
+df.head()
+
+#분석을 위해 데이터를 표준화. StandrdScaler().fit_transform()활용 표준화
+scal = StandrdScaler().fit_transform(df)
+scal
+
+#pd.DataFrame(scal)를 통해 데이터 프레임화
+df_scal = pd.DataFrame(scal)
+df_scal
+
+#df_scal.columns = df.columns으로 column 명 가져오기
+df_scal.columns = df.columns
+df_scal
+
+#df_scal.corr(method = 'spearman')설정으로 상관성 분석 ex> spearman, pearson, kendall
+corr = df_scal.corr(method = 'spearman')
+corr.head()
+
+#상관분석 결과 시각화
+import seaborn as sns
+%matplotlib inline
+plt.figure(figsize = (30, 30)) #그림 사이즈 설정
+#삼각형 마스크를 만든다.(위 쪽 삼각형에 True, 아래 삼각형에 False)
+mask = np.zeros_like(corr, dtype = np.bool)
+mask[np.triu_indices_from(mask)] = True
+#히트맵 그리기
+sns.heatmap(corr, #데이터
+            cmap = 'Reds', #히트맵 색상
+            annot = True, #실제값을 표시한다. #annot_kws={"size": 10}로 글자 크기 조절
+            mask = mask, #표시하지 않을 마스크 부분을 지정한다
+            linewidths = .5, #경계면 실선으로 구분하기
+            cbar_kws = {"shrink": .5) #컬러바 크기를 절반으로 줄이기 
+            vmin = -1, vmax = 1 #컬러바 범위 -1 ~ 1 
+            )
+
+#함수 설정을 이용해 pvalue 를 계산하여 데이터 프레임화
+def calculate_pvalues(df)
+    df = df.dropna().get_numeric_data()
+    dfcols = pd.DataFrame(columns=df.columns)
+    pvalues = dfcols.transpose().join(dfcols, how = 'outer')
+    for r in df.columns:
+        for c in df.columns:
+           pvalues[r][c] = round(spearmanr(df[r], df[c])[1], 4)
+    return pvalues
+    
+#함수를 이용 p-value 계산 
+pvalues = calculate_pvalues(df_scal)
+pvalues
+
+#분석한 데이터프레임을 엑셀로 저장, 여러 시트에 데이터 프레임을 저장
+with pd.ExcelWriter('G1.xlsx') as writer
+    corr.to_excel(writer, sheet_name = 'corr')
+    pvalues.to_excel(writer, sheet_name = 'pvalues')
+    
+           
