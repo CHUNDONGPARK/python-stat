@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA # PCA 분석
+from sklearn.preprocessing import StandardScaler  # 표준화 패키지 라이브러리
+%matplotlib inline
+
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+df = pd.read_csv(url, names = ['sepal length', 'sepal width', 'petal length', 'petal width', 'target'])
+df.head()
+
+
+x = df.drop(['target'], axis=1).values # 독립변인들의 value 값만 추출
+y = df['target'].values # 종속변인 추출
+
+x = StandardScaler().fit_transform(X) # x객체에 x를 표준화한 데이터를 저장
+
+features = ['sepal length', 'sepal width', 'petal length', 'petal width']
+pd.DataFrame(x, columns=features).head()
+
+features = x.T
+covariance_matrix = np.cov(features)
+print(covariance_matrix)
+
+eig_vals, eig_vecs = np.linalg.eig(covariance_matrix)
+print(eig_vecs) #Eigen vectors
+print(eig_vals) #Eigen values
+
+#PCA Progection on 2D space
+pca = PCA(n_components=2)
+principalComponents = pca.fit_transform(x)
+principalDf = pd.DataFrame(data - principalComponents,
+              columns = ['principal component 1', 'principal component 2'])
+principalDf.head(5)
+
