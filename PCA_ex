@@ -1,14 +1,16 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA # PCA 분석
+from sklearn.decomposition import PCA # sklearn의 PCA를 통해서 쉽게 PCA 적용 
 from sklearn.preprocessing import StandardScaler  # 표준화 패키지 라이브러리
+from pandas.plotting import scatter_matrix
 %matplotlib inline
 
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
 df = pd.read_csv(url, names = ['sepal length', 'sepal width', 'petal length', 'petal width', 'target'])
 df.head()
 
+scatter_materix(df, c =df['target'], marker = 'o', s = 10, alpha = .8, figsize = (12,8))
 
 x = df.drop(['target'], axis=1).values # 독립변인들의 value 값만 추출
 y = df['target'].values # 종속변인 추출
@@ -26,10 +28,41 @@ eig_vals, eig_vecs = np.linalg.eig(covariance_matrix)
 print(eig_vecs) #Eigen vectors
 print(eig_vals) #Eigen values
 
-#PCA Progection on 2D space
+#PCA Projection on 2D space
 pca = PCA(n_components=2)
 principalComponents = pca.fit_transform(x)
 principalDf = pd.DataFrame(data - principalComponents,
               columns = ['principal component 1', 'principal component 2'])
 principalDf.head(5)
+
+finalDf = pd.concat([principalDf, df[['taret']]], axis = 1)
+finalDf.head(5)
+
+pca.explained_variance_ratio_
+
+from matplotlib import pyplot as plt
+plt.matshow(pca.components_, cmap = 'viridis')
+plt.yticks([0, 1], ["1st pc", "2nd pc"])
+plt.colorbar()
+plt.xticks(range(len(features)), features, roration = 60, ha = 'left')
+plt.xlabel("feature")
+plt.ylabel("pc")
+
+fig = plt.figure(figsize = (8, 8))
+ax = fig.add_subplot(1, 1, 1)
+ax.set_xlabel('Principal Component 1', fontsize = 15)
+ax.set_ylabel('Principal Component 2', fontsize = 15)
+ax.set_title('2 component PCA', fontsize = 20)
+
+targets = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica']
+colors = ['r', 'g', 'b']
+for target, color in zip(targets, colors):
+    indicesToKeep = finalDf['target'] == target
+    ax.scatter(finalDf.loc[indicesToKeep, 'principal component1']
+               , finalDf.loc[indicesToKeep, 'principal component2']
+               , c = color
+               , s = 50)
+ax.legend(targets)
+ax.grid()
+
 
